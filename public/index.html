@@ -1,15 +1,3 @@
-<?php
-
-$mob_list = file('mob_proto.json');
-$mob_list = json_decode($mob_list[0]);
-
-$say = count($mob_list);
-
-header("Expires: ".gmdate("D, d M Y H:i:s", time()+1800)." GMT");
-header("Cache-Control: max-age=1800");
-
-?>
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -84,63 +72,10 @@ header("Cache-Control: max-age=1800");
 									 <th data-field="ResistBell" data-sortable="true" class="text-center" data-visible="true" >Yelpaze</th>
 									 <th data-field="ResistFan" data-sortable="true" class="text-center" data-visible="true" >Çan</th>
 									 <th data-field="ResistMagic" data-sortable="true" class="text-center" data-visible="true" >Büyü</th>
-									 
-									
-                                   
                                     </tr>
                                     </thead>
                                     <tbody id="feedback">
-                                    <?php 
-                                
-                                $say = 1;
-                                    foreach($mob_list as $item) {
-                                     
-									 $elements = array(
-									 'Ateş' => $item->ResistFire,
-									 'Şimşek' => $item->ResistElect,
-									 'Karanlık' => $item->ResistDark,
-									 'Buz' => $item->ResistIce,
-									 'Dünya' => $item->ResistEarth,
-									 'Toprak' => $item->ResistWind
- 									 );
-									 
-									 $element_text = "";
-									 foreach($elements as $key=> $element) {
-										 if($element < 0) {
-											 $element_text .= $key." ";
-										 }
-										
-									 }
-								
-									 
-									
-									
-									 
-                                    ?>
-                                    <tr>
-                                        <td><?php echo $item->vnum; ?></td>
-                                        <td><?php echo $item->name; ?></td>
-										<td><?php echo $item->level; ?></td>
-                                        <td><?php echo number_format($item->hp,0,".","."); ?></td>
-										<td><?php echo $item->rank; ?></td>
-										<td><?php echo $item->BattleType; ?></td>
-                                        <td><?php echo str_replace('|',' ',$item->flags); ?></td>
-										<td><?php echo $item->ImmuneFlag; ?></td>
-										<td><?php echo $element_text; ?></td>
-										<td><?php echo $item->ResistSword;?></td>
-										<td><?php echo $item->ResistTwoHand;?></td>
-										<td><?php echo $item->ResistDagger;?></td>
-										<td><?php echo $item->ResistBow;?></td>
-										<td><?php echo $item->ResistClaw;?></td>
-										<td><?php echo $item->ResistBell;?></td>
-										<td><?php echo $item->ResistFan;?></td>
-										<td><?php echo $item->ResistMagic;?></td>
-										 
-                                        
-                                    </tr>
-                                    <?php 
-									} 
-									?>
+
                                     </tbody>
                                 </table>
                             </div>
@@ -251,6 +186,7 @@ header("Cache-Control: max-age=1800");
 
 
     });
+
 </script>
 </html>
 <script type="text/javascript">
@@ -310,6 +246,63 @@ header("Cache-Control: max-age=1800");
             }
         });
  
+  function ajax_get(value) {
+
+            $.ajax({
+                type: "GET",
+                url: './mob_proto.json',
+                dataType: 'json',
+                success: function (data) {
+
+                    var count = Object.keys(data).length;
+                    document.getElementById("toplam_oyuncu").innerHTML = "<p>Toplam Oyuncu</p>" + count;
+                    jQuery.each(data, function (i, val) {
+                        var rowId = $("#bootstrap-table >tbody >tr").length;
+                        rowId = rowId + 1;
+						
+						
+                     
+                        let veriler = {
+                            mob_id: val.vnum,
+                            mob_name: val.name,
+                            level: val.level,
+                            health: val.hp,
+                            rank: val.rank,
+                            type: val.flags,
+                            bonus: val.ImmuneFlag,
+                            element: 'duzenlencek',
+                            ResistSword: val.ResistSword,
+                            ResistTwoHand: val.ResistTwoHand,
+                            ResistDagger: val.ResistDagger,
+                            ResistBow: val.ResistBow,
+                            ResistClaw: val.ResistClaw,
+                            ResistBell: val.ResistBell,
+                            ResistFan: val.ResistFan,
+                            ResistMagic: val.ResistMagic,
+                        };
+
+                        if (value == 1) {
+                            $('#bootstrap-table').bootstrapTable('insertRow', {
+                                index: rowId,
+                                row: veriler //myList is an array containing json data in each row
+                            });
+
+                        } else {
+                            $('#bootstrap-table').bootstrapTable('load', {
+                                index: rowId,
+                                row: veriler //myList is an array containing json data in each row
+                            });
+
+                        }
+
+                    });
+                }
+            });
+           // setTimeout(function(){ajax_get(2);}, 20000);
+        }
+
+        ajax_get(1);
+		
         //activate the tooltips after the data table is initialized
         $('[rel="tooltip"]').tooltip();
 
